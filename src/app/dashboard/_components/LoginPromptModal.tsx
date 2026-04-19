@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { HiOutlineXMark } from "react-icons/hi2";
 
 interface LoginPromptModalProps {
