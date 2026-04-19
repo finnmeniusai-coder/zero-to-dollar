@@ -49,27 +49,38 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <header className="px-6 py-20 md:py-32 flex flex-col items-center text-center">
-        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9] text-text-primary mb-8 animate-fade-up">
-          Your corner of <br className="hidden md:block" /> the internet.
-        </h1>
-        <p 
-          className="text-lg md:text-xl text-text-secondary max-w-[560px] leading-relaxed mb-10 animate-fade-up"
-          style={{ animationDelay: '100ms' }}
-        >
-          Build a beautiful, designer-quality link-in-bio page in seconds. No code, just you.
-        </p>
-        <div 
-          className="flex flex-col items-center gap-4 animate-fade-up"
-          style={{ animationDelay: '200ms' }}
-        >
-          <Link 
-            href="/dashboard"
-            className="bg-primary-coral text-white px-10 py-5 rounded-full font-bold uppercase tracking-wider text-sm shadow-xl shadow-primary-coral/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+      <header className="px-6 pt-20 pb-10 md:pt-32 md:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto overflow-hidden">
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9] text-text-primary mb-8 animate-fade-up">
+            Your corner of <br className="hidden md:block" /> the internet.
+          </h1>
+          <p 
+            className="text-lg md:text-xl text-text-secondary max-w-[560px] leading-relaxed mb-10 animate-fade-up"
+            style={{ animationDelay: '100ms' }}
           >
-            Create your page — it&apos;s free
-          </Link>
-          <span className="text-xs font-bold text-text-muted opacity-60">No credit card. No signup to start building.</span>
+            Build a beautiful, designer-quality link-in-bio page in seconds. No code, just you and your creations.
+          </p>
+          <div 
+            className="flex flex-col items-center lg:items-start gap-4 animate-fade-up"
+            style={{ animationDelay: '200ms' }}
+          >
+            <Link 
+              href="/dashboard"
+              className="bg-primary-coral text-white px-10 py-5 rounded-full font-bold uppercase tracking-wider text-sm shadow-xl shadow-primary-coral/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              Create your page — it&apos;s free
+            </Link>
+            <span className="text-xs font-bold text-text-muted opacity-60">No credit card required. Start building for free.</span>
+          </div>
+        </div>
+        
+        <div className="relative animate-fade-up" style={{ animationDelay: '300ms' }}>
+          <div className="absolute -inset-4 bg-primary-coral/5 rounded-[60px] blur-3xl -z-10" />
+          <img 
+            src="/hero.png" 
+            alt="Corner Preview" 
+            className="w-full h-auto rounded-[40px] shadow-2xl border border-border-base/50"
+          />
         </div>
       </header>
 

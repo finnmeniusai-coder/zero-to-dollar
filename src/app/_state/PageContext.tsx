@@ -175,25 +175,38 @@ export function PageProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, [refresh]);
 
+  // Helper to save to DB
+  const saveToDb = useCallback(async (currentData: PageData) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+
+    try {
+      const { error } = await supabase.from("profiles").upsert({
+        id: session.user.id,
+        username: currentData.profile.username,
+        display_name: currentData.profile.displayName,
+        is_published: currentData.isPublished,
+        full_data: currentData,
+        updated_at: new Date().toISOString(),
+      });
+
+      if (error) throw error;
+      console.log("Saved successfully");
+    } catch (err) {
+      console.error("Failed to save:", err);
+    }
+  }, []);
+
   // Auto-save logic
   useEffect(() => {
-    const saveTimeout = setTimeout(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user || isLoading) return;
-
-      try {
-        await supabase.from("profiles").upsert({
-          id: session.user.id,
-          full_data: data,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        console.error("Failed to auto-save:", err);
-      }
+    if (isLoading) return;
+    
+    const saveTimeout = setTimeout(() => {
+      saveToDb(data);
     }, 2000); // Save after 2s of no changes
 
     return () => clearTimeout(saveTimeout);
-  }, [data, isLoading]);
+  }, [data, isLoading, saveToDb]);
 
   const setProfile = useCallback((patch: Partial<ProfileData>) => {
     setData((prev) => ({

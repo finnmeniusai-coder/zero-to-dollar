@@ -16,8 +16,22 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Corner | Your corner of the internet",
-  description: "Create a beautiful link-in-bio page in seconds.",
+  title: "Corner | Your personal corner of the internet",
+  description: "Create a beautiful, designer-quality link-in-bio page in seconds. Build your digital identity with Corner.",
+  keywords: ["link in bio", "digital business card", "personal website", "creator tools"],
+  authors: [{ name: "Corner Inc." }],
+  openGraph: {
+    title: "Corner | Your personal corner of the internet",
+    description: "Build a stunning link-in-bio page in seconds.",
+    url: "https://corner.link",
+    siteName: "Corner",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Corner | Your personal corner of the internet",
+    description: "Build a stunning link-in-bio page in seconds.",
+  },
 };
 
 export default function RootLayout({
