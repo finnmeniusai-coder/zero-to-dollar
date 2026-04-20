@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { ToastProvider } from "../_components/Toast";
+import { useToast } from "../_components/Toast";
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { Sidebar, TabId } from "./_components/Sidebar";
 import { PreviewPanel } from "./_components/PreviewPanel";
 import { FullScreenPreview } from "./_components/FullScreenPreview";
 
+import { usePage } from "../_state/PageContext";
 // Tabs
 import { LinksTab } from "./_tabs/LinksTab";
 import { ProfileTab } from "./_tabs/ProfileTab";
@@ -14,9 +15,32 @@ import { AppearanceTab } from "./_tabs/AppearanceTab";
 import { PaymentsTab } from "./_tabs/PaymentsTab";
 import { AccountTab } from "./_tabs/AccountTab";
 
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabId>("links");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const toast = useToast();
+  const { refresh } = usePage();
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (!status) return;
+
+    const username = searchParams.get("username");
+    
+    if (status === "success") {
+      toast.show(`Your page is now live at corner.link/${username}`);
+      refresh(); // Sync the new "Live" status from DB
+    } else if (status === "cancelled") {
+      toast.show("Payment cancelled — your page stays in draft");
+    }
+
+    // Clean URL
+    window.history.replaceState({}, "", "/dashboard");
+  }, [searchParams, toast, refresh]);
 
   const renderTab = () => {
     switch (activeTab) {
@@ -30,8 +54,7 @@ export default function Dashboard() {
   };
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
         <DashboardHeader onPreviewClick={() => setIsPreviewOpen(true)} />
         
         <div className="flex-1 flex flex-col md:flex-row">
@@ -54,6 +77,5 @@ export default function Dashboard() {
           onClose={() => setIsPreviewOpen(false)} 
         />
       </div>
-    </ToastProvider>
   );
 }

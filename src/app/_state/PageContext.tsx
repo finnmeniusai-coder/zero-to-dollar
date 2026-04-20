@@ -58,6 +58,8 @@ export interface PageData {
   appearance: AppearanceData;
   payments: PaymentsData;
   isPublished: boolean;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
 }
 
 export interface PageContextType {
@@ -144,12 +146,20 @@ export function PageProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (profile && profile.full_data) {
-        setData(profile.full_data as PageData);
+        setData({
+          ...(profile.full_data as PageData),
+          isPublished: profile.is_published,
+          stripeCustomerId: profile.stripe_customer_id,
+          stripeSubscriptionId: profile.stripe_subscription_id,
+        });
       } else if (profile) {
         // If profile exists but no data, use current data but update username
         setData(prev => ({
           ...prev,
-          profile: { ...prev.profile, username: profile.username || prev.profile.username }
+          profile: { ...prev.profile, username: profile.username || prev.profile.username },
+          isPublished: profile.is_published,
+          stripeCustomerId: profile.stripe_customer_id,
+          stripeSubscriptionId: profile.stripe_subscription_id,
         }));
       }
     } catch (err) {

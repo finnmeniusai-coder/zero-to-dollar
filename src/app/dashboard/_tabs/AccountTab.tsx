@@ -65,6 +65,35 @@ export function AccountTab() {
     setTimeout(handleLogout, 2000);
   };
 
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    setPortalLoading(true);
+
+    try {
+      const response = await fetch("/api/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      const { url, error } = await response.json();
+      if (error) throw new Error(error);
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (err: any) {
+      console.error("Portal error:", err);
+      toast.show(err.message === "No Stripe customer found" 
+        ? "You don't have an active subscription yet." 
+        : "Failed to open subscription manager.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-[640px] px-2 py-4 pb-32">
       <div className="mb-8">
@@ -126,8 +155,12 @@ export function AccountTab() {
                 <p className="text-sm text-text-muted">Managed via Stripe</p>
               </div>
             </div>
-            <button className="text-sm font-bold text-text-primary hover:underline px-2">
-              Manage subscription
+            <button 
+              onClick={handleManageSubscription}
+              disabled={portalLoading}
+              className="text-sm font-bold text-text-primary hover:underline px-2 disabled:opacity-50"
+            >
+              {portalLoading ? "Loading..." : "Manage subscription"}
             </button>
           </div>
         </section>

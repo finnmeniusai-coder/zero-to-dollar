@@ -7,6 +7,7 @@ import { usePage } from "../../_state/PageContext";
 import { useToast } from "../../_components/Toast";
 import { LoginPromptModal } from "./LoginPromptModal";
 import { useAuth } from "../../_lib/useAuth";
+import { supabase } from "../../../lib/supabase";
 import { HiOutlineEye, HiArrowTopRightOnSquare } from "react-icons/hi2";
 
 interface DashboardHeaderProps {
@@ -33,13 +34,42 @@ export function DashboardHeader({ onPreviewClick }: DashboardHeaderProps) {
     }
   };
 
-  const handlePublish = () => {
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  
+  const handlePublish = async () => {
     if (isAuthenticated) {
       if (data.isPublished) {
-        toast.show("Page updated");
+        toast.show("Page updated successfully");
       } else {
-        setPublished(true);
-        toast.show("Page published — you're live!");
+        // Trigger Stripe Checkout
+        try {
+          setIsCheckoutLoading(true);
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (!session?.user) throw new Error("No user session");
+
+          const response = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: session.user.id,
+              email: session.user.email,
+              username: data.profile.username,
+            }),
+          });
+
+          const { url, error } = await response.json();
+          if (error) throw new Error(error);
+
+          if (url) {
+            window.location.href = url;
+          }
+        } catch (err: any) {
+          console.error("Checkout redirect failed:", err);
+          toast.show("Failed to start checkout. Please try again.");
+        } finally {
+          setIsCheckoutLoading(false);
+        }
       }
     } else {
       // Save work to sessionStorage and redirect
@@ -92,9 +122,10 @@ export function DashboardHeader({ onPreviewClick }: DashboardHeaderProps) {
 
         <button
           onClick={handlePublish}
-          className="px-5 py-2 text-sm font-semibold text-white bg-primary-coral rounded-xl hover:bg-primary-coral-hover shadow-lg shadow-primary-coral/10 transition-colors"
+          disabled={isCheckoutLoading}
+          className="px-5 py-2 text-sm font-semibold text-white bg-primary-coral rounded-xl hover:bg-primary-coral-hover shadow-lg shadow-primary-coral/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {data.isPublished ? "Update Page" : "Publish"}
+          {isCheckoutLoading ? "Processing..." : (data.isPublished ? "Update Page" : "Publish")}
         </button>
       </div>
 

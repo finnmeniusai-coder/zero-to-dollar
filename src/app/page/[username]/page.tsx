@@ -1,10 +1,10 @@
 "use client";
 
 import React, { use, useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
-import { PageData } from "../_state/PageContext";
-import { PublicPage } from "../_components/PublicPage";
-import { EXAMPLES } from "../_lib/examples";
+import { supabase } from "../../../lib/supabase";
+import { PageData } from "../../_state/PageContext";
+import { PublicPage } from "../../_components/PublicPage";
+import { EXAMPLES } from "../../_lib/examples";
 import Link from "next/link";
 
 interface PageProps {
@@ -15,6 +15,7 @@ export default function UserPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const username = resolvedParams.username.toLowerCase();
   const [pageData, setPageData] = useState<PageData | null>(null);
+  const [isPublished, setIsPublished] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,11 +37,9 @@ export default function UserPage({ params }: PageProps) {
           .single();
 
         if (profile) {
-          if (profile.is_published && profile.full_data) {
+          setIsPublished(profile.is_published);
+          if (profile.full_data) {
             setPageData(profile.full_data as PageData);
-          } else {
-            // Profile exists but not live
-            setPageData({ profile: { username } } as any); // Marker for "Not Live"
           }
         }
       } catch (err) {
@@ -61,20 +60,25 @@ export default function UserPage({ params }: PageProps) {
     );
   }
 
-  if (!pageData || !pageData.links) {
-    const isNotLive = pageData?.profile?.username === username;
+  if (!pageData) {
     return (
       <div className="min-h-screen bg-bg-cream flex flex-col items-center justify-center p-6 text-center">
-        <h1 className="font-display text-4xl text-text-primary mb-4">
-          {isNotLive ? "This page isn't live yet." : "Corner not found."}
-        </h1>
-        <p className="text-text-secondary mb-8">
-          {isNotLive 
-            ? "The creator is still polishing this corner. Check back soon!" 
-            : "This corner hasn't been claimed yet."}
-        </p>
+        <h1 className="font-display text-4xl text-text-primary mb-4">Corner not found.</h1>
+        <p className="text-text-secondary mb-8">This corner hasn&apos;t been claimed yet.</p>
         <Link href="/" className="bg-primary-coral text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-primary-coral/20">
-          Claim your own corner
+          Claim your corner
+        </Link>
+      </div>
+    );
+  }
+
+  if (!isPublished) {
+    return (
+      <div className="min-h-screen bg-bg-cream flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="font-display text-4xl text-text-primary mb-4">This page isn&apos;t live yet.</h1>
+        <p className="text-text-secondary mb-8">The owner hasn&apos;t published it to the public yet.</p>
+        <Link href="/" className="bg-primary-coral text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-primary-coral/20">
+          Create your own corner
         </Link>
       </div>
     );

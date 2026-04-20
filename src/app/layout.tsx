@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import { PageProvider } from "./_state/PageContext";
+import { ToastProvider } from "./_components/Toast";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -46,7 +47,9 @@ export default function RootLayout({
     >
       <body className="h-full font-sans text-text-primary">
         <PageProvider>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </PageProvider>
       </body>
     </html>

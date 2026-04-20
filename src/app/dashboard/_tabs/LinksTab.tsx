@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePage, LinkItem } from "../../_state/PageContext";
 import { detectPlatform } from "../../_lib/platforms";
 import { Toggle } from "../../_components/Toggle";
@@ -132,6 +132,12 @@ function SortableLinkRow({ link, onEdit, onDelete }: SortableLinkRowProps) {
 export function LinksTab() {
   const { data, addLink, updateLink, deleteLink, reorderLinks } = usePage();
   const [isAdding, setIsAdding] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
   
   // Inline Form State
@@ -280,25 +286,36 @@ export function LinksTab() {
             <p className="text-text-muted font-medium">No links yet. Add your first one above.</p>
           </div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={data.links.map((l) => l.id)}
-              strategy={verticalListSortingStrategy}
+          isMounted ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              {data.links.map((link) => (
-                <SortableLinkRow
-                  key={link.id}
-                  link={link}
-                  onEdit={startEditing}
-                  onDelete={deleteLink}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+              <SortableContext
+                items={data.links.map((l) => l.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {data.links.map((link) => (
+                  <SortableLinkRow
+                    key={link.id}
+                    link={link}
+                    onEdit={startEditing}
+                    onDelete={deleteLink}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            data.links.map((link) => (
+              <SortableLinkRow
+                key={link.id}
+                link={link}
+                onEdit={startEditing}
+                onDelete={deleteLink}
+              />
+            ))
+          )
         )}
       </div>
     </div>
